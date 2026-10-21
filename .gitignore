@@ -1,0 +1,15 @@
+# Pythonの仮想環境
+venv/
+
+# Pythonが自動生成するファイル
+__pycache__/
+*.pyc
+
+# 環境変数・秘密情報
+.env
+
+# ローカルのデータベース
+*.db
+
+# VS Codeの個人設定
+.vscode/
