@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My SNS</title>
+    <style>
+        body {
+            margin: 0;
+            background: #f3f4f6;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            text-align: center;
+            color: #2563eb;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px #ddd;
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            height: 90px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .username {
+            font-weight: bold;
+        }
+
+        .actions {
+            color: #64748b;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>My SNS</header>
+
+    <div class="container">
+
+        <div class="card">
+            <h3>新しい投稿</h3>
+            <textarea placeholder="いま何してる？"></textarea>
+            <button>投稿する</button>
+        </div>
+
+        <div class="card">
+            <p class="username">ユーザーA</p>
+            <p>初めてのSNSアプリを開発中！</p>
+            <div class="actions">
+                ♡ いいね　　コメント
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

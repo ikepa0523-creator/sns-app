@@ -1,21 +1,17 @@
 
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
+BASE_DIR = Path(__file__).resolve().parent
+
+
 @app.get("/", response_class=HTMLResponse)
 def home():
-    return """
-    <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>My SNS</title>
-        </head>
-        <body>
-            <h1>ようこそ！My SNSへ！</h1>
-            <p>初めてのSNSアプリ開発に成功！</p>
-        </body>
-    </html>
-    """
+    html_file = BASE_DIR / "templates" / "index.html"
+    return html_file.read_text(encoding="utf-8")
+
 
