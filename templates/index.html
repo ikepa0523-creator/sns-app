@@ -1,90 +1,20 @@
-
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My SNS</title>
-    <style>
-        body {
-            margin: 0;
-            background: #f3f4f6;
-            font-family: Arial, sans-serif;
-        }
-
-        header {
-            background: white;
-            padding: 20px;
-            text-align: center;
-            color: #2563eb;
-            font-size: 26px;
-            font-weight: bold;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 30px auto;
-            padding: 0 15px;
-        }
-
-        .card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px #ddd;
-        }
-
-        textarea {
-            width: 100%;
-            box-sizing: border-box;
-            height: 90px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-
-        button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-
-        .username {
-            font-weight: bold;
-        }
-
-        .actions {
-            color: #64748b;
-            margin-top: 15px;
-        }
-    </style>
-</head>
-<body>
-
-    <header>My SNS</header>
-
-    <div class="container">
-
-        <div class="card">
-            <h3>新しい投稿</h3>
-            <textarea placeholder="いま何してる？"></textarea>
-            <button>投稿する</button>
-        </div>
-
-        <div class="card">
-            <p class="username">ユーザーA</p>
-            <p>初めてのSNSアプリを開発中！</p>
-            <div class="actions">
-                ♡ いいね　　コメント
-            </div>
-        </div>
-
-    </div>
-
-</body>
-</html>
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>My SNS</title><style>
+:root{font-family:system-ui,sans-serif;color:#17233b;background:#f1f5fa}*{box-sizing:border-box}body{margin:0}header{background:#fff;border-bottom:1px solid #dbe4ef;padding:18px 24px;font-size:23px;font-weight:800;color:#2563eb}main{max-width:780px;margin:24px auto;padding:0 14px}.card{background:white;border:1px solid #e1e7f0;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 3px 12px #162d5010}input,textarea{font:inherit;border:1px solid #cad5e3;border-radius:9px;padding:11px;width:100%;margin:5px 0}textarea{min-height:90px;resize:vertical}button{border:0;background:#2563eb;color:white;border-radius:9px;padding:10px 15px;cursor:pointer;margin:4px 5px 4px 0}button.secondary{background:#e8eef7;color:#234}button.danger{background:#fce8e8;color:#a22}.muted{color:#64748b;font-size:14px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.hidden{display:none}.post{border-top:1px solid #e5eaf0;padding:15px 0}.post:first-child{border-top:0}.comment{background:#f5f7fa;border-radius:8px;padding:8px;margin:6px 0}.tabs button{background:#e8eef7;color:#234}.tabs button.active{background:#2563eb;color:#fff}h2{margin:0 0 14px}#notice{color:#b42318;min-height:22px}
+</style></head><body><header>✦ My SNS</header><main><p id="notice" role="status"></p>
+<section id="auth" class="card"><h2>ログイン・新規登録</h2><input id="username" placeholder="ユーザー名" autocomplete="username"><input id="password" type="password" placeholder="パスワード（8文字以上）" autocomplete="current-password"><button onclick="auth('login')">ログイン</button><button class="secondary" onclick="auth('register')">新規登録</button></section>
+<section id="app" class="hidden"><div class="card row"><strong id="welcome"></strong><button class="secondary" onclick="logout()">ログアウト</button></div><div class="card"><h2>新しい投稿</h2><textarea id="content" maxlength="1000" placeholder="いま何してる？"></textarea><button onclick="createPost()">投稿する</button></div><div class="card"><div class="tabs"><button id="tab-all" onclick="showFeed('all')">すべての投稿</button><button id="tab-feed" onclick="showFeed('feed')">フォロー中</button></div><div id="posts"></div></div><div class="card"><h2>ユーザーを探す</h2><div id="users"></div></div></section>
+</main><script>
+let token=sessionStorage.getItem('sns_token')||'',me='',feedMode='all';
+const $=id=>document.getElementById(id);
+function notice(s){$('notice').textContent=s;}
+async function api(path,method='GET',data){let r=await fetch(path,{method,headers:{...(data?{'Content-Type':'application/json'}:{}),...(token?{Authorization:'Bearer '+token}:{})},...(data?{body:JSON.stringify(data)}:{})});let j=await r.json().catch(()=>({}));if(!r.ok)throw Error(typeof j.detail==='string'?j.detail:'操作に失敗しました');return j;}
+async function run(fn){try{notice('');await fn();}catch(e){notice(e.message);}}
+async function auth(kind){await run(async()=>{const username=$('username').value.trim(),password=$('password').value;if(!username||password.length<8)throw Error('ユーザー名と8文字以上のパスワードを入力してね');if(kind==='register')await api('/register','POST',{username,password});const result=await api('/login','POST',{username,password});token=result.access_token;sessionStorage.setItem('sns_token',token);await start();});}
+async function start(){try{const u=await api('/me');me=u.username;$('auth').classList.add('hidden');$('app').classList.remove('hidden');$('welcome').textContent='こんにちは、'+me+' さん';await Promise.all([showFeed(feedMode),loadUsers()]);}catch(e){logout();notice('ログインし直してください');}}
+function logout(){token='';me='';sessionStorage.removeItem('sns_token');$('auth').classList.remove('hidden');$('app').classList.add('hidden');}
+async function createPost(){await run(async()=>{const content=$('content').value.trim();if(!content)throw Error('投稿内容を入力してね');await api('/posts','POST',{content});$('content').value='';await showFeed(feedMode);});}
+async function showFeed(mode){feedMode=mode;$('tab-all').classList.toggle('active',mode==='all');$('tab-feed').classList.toggle('active',mode==='feed');await run(async()=>{let data=await api(mode==='all'?'/posts':'/feed');const area=$('posts');area.replaceChildren();if(!data.length){area.textContent='まだ投稿がありません';return;}for(const p of data){const card=document.createElement('div');card.className='post';const name=document.createElement('strong');name.textContent='@'+p.username;card.append(name);const content=document.createElement('p');content.textContent=p.content;card.append(content);const actions=document.createElement('div');const like=btn((p.liked?'♥':'♡')+' '+p.likes,async()=>{await api('/posts/'+p.id+'/like','POST');await showFeed(mode);});actions.append(like);if(p.author_id===null){const label=document.createElement('span');label.className='muted';label.textContent=' 以前の投稿';actions.append(label);}if(p.username===me&&p.author_id!==null){actions.append(btn('編集',async()=>{let value=prompt('新しい内容',p.content);if(value===null)return;await api('/posts/'+p.id,'PUT',{content:value});await showFeed(mode);},'secondary'));actions.append(btn('削除',async()=>{if(!confirm('削除しますか？'))return;await api('/posts/'+p.id,'DELETE');await showFeed(mode);},'danger'));}card.append(actions);for(const c of p.comments){const el=document.createElement('div');el.className='comment';el.textContent='@'+c.username+'：'+c.content;card.append(el);}const form=document.createElement('div');form.className='row';const field=document.createElement('input');field.placeholder='コメントを書く';field.maxLength=1000;const send=btn('送信',async()=>{await api('/posts/'+p.id+'/comments','POST',{content:field.value});await showFeed(mode);});form.append(field,send);card.append(form);area.append(card);}});}
+function btn(label,fn,cls='secondary'){const b=document.createElement('button');b.textContent=label;b.className=cls;b.addEventListener('click',()=>run(fn));return b;}
+async function loadUsers(){await run(async()=>{const [users,following]=await Promise.all([api('/users'),api('/following')]);const area=$('users');area.replaceChildren();for(const u of users){if(u.username===me)continue;const line=document.createElement('div');line.className='row';const label=document.createElement('span');label.textContent='@'+u.username;const isFollowing=following.includes(u.username);const b=btn(isFollowing?'フォロー解除':'フォロー',async()=>{await api('/users/'+encodeURIComponent(u.username)+'/follow','POST');await loadUsers();if(feedMode==='feed')await showFeed('feed');});line.append(label,b);area.append(line);}if(!area.childNodes.length)area.textContent='ほかのユーザーはまだいません';});}
+if(token)start();
+</script></body></html>
